@@ -2,6 +2,7 @@
 import numpy as np
 import timeit
 from numba import jit
+import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib import colors
 
@@ -24,6 +25,22 @@ def mandelbrot_set(xmin,xmax,ymin,ymax,width,height,maxiter):
             n3[i,j] = mandelbrot(r1[i] + 1j*r2[j],maxiter)
     return (r1,r2,n3)
 
+def mandelbrot_image(xmin,xmax,ymin,ymax,width=3,height=3,maxiter=80,cmap='hot'):
+    dpi = 72
+    img_width = dpi * width
+    img_height = dpi * height
+    x,y,z = mandelbrot_set(xmin,xmax,ymin,ymax,img_width,img_height,maxiter)
 
+    fig, ax = plt.subplots(figsize=(width, height),dpi=72)
+    ticks = np.arange(0,img_width,3*dpi)
+    x_ticks = xmin + (xmax-xmin)*ticks/img_width
+    plt.xticks(ticks, x_ticks)
+    y_ticks = ymin + (ymax-ymin)*ticks/img_width
+    plt.yticks(ticks, y_ticks)
 
-timeit.timeit(mandelbrot_set(-2.0,0.5,-1.25,1.25,1000,1000,80))
+    norm = colors.PowerNorm(0.3)
+    ax.imshow(z.T,cmap=cmap,origin='lower',norm=norm)
+    plt.show()
+
+#timeit.timeit(mandelbrot_set(-2.0,0.5,-1.25,1.25,1000,1000,80))
+mandelbrot_image(-2.0,0.5,-1.25,1.25,maxiter=80,cmap='gnuplot2')
